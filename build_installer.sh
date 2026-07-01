@@ -49,65 +49,43 @@ cat > "$PKG_RES/welcome.html" << 'WELCOME'
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <style>
-  body {
-    font-family: -apple-system, sans-serif;
-    padding: 24px 28px;
-    color: #111;
-    background: transparent;
-  }
-  h2 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 14px;
-    color: #002620;
-  }
-  p {
-    font-size: 13px;
-    line-height: 1.65;
-    color: #333;
-    margin: 0 0 12px;
-  }
+  body  { font-family: -apple-system, sans-serif; padding: 24px 28px; color: #111; background: transparent; }
+  h2   { font-size: 18px; font-weight: 700; margin: 0 0 14px; color: #002620; }
+  p    { font-size: 13px; line-height: 1.65; color: #333; margin: 0 0 12px; }
   .prereq {
-    background: #F0FAF6;
     border-left: 3px solid #00c278;
     border-radius: 0 6px 6px 0;
     padding: 12px 16px;
     margin-top: 16px;
+    background: rgba(0,194,120,0.10);
   }
-  .prereq strong {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #004d30;
-    margin-bottom: 6px;
+  .prereq-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #00874f; margin-bottom: 6px;
   }
-  .prereq p {
-    margin: 0;
-    font-size: 12.5px;
-    color: #2a5a44;
+  .prereq-body { font-size: 12.5px; line-height: 1.6; color: #333; }
+  @media (prefers-color-scheme: dark) {
+    body          { color: #ddd; }
+    h2            { color: #00c278; }
+    p             { color: #bbb; }
+    .prereq-title { color: #00c278; }
+    .prereq-body  { color: #bbb; }
   }
 </style>
 </head>
 <body>
   <h2>Welcome to GAM Admin</h2>
-  <p>
-    This installer will add <strong>IT Admin</strong> to your Applications folder —
-    a tool built by the Aircall IT team to manage Google Workspace users and groups
-    directly from your Mac.
-  </p>
-  <p>
-    Everything runs locally on your machine. No data is sent to any external server.
-  </p>
+  <p>This installer will add <strong>IT Admin</strong> to your Applications folder &mdash;
+  a tool built by the Aircall IT team to manage Google Workspace users and groups
+  directly from your Mac.</p>
+  <p>Everything runs locally on your machine. No data is sent to any external server.</p>
   <div class="prereq">
-    <strong>Before you continue</strong>
-    <p>
-      GAM (Google Admin Manager) must be installed and set up on this Mac before
-      IT Admin will work. Your IT administrator will have taken care of this for you.
-      If you are unsure, reach out to them before proceeding.
-    </p>
+    <div class="prereq-title">Before you continue</div>
+    <div class="prereq-body">GAM (Google Admin Manager) must be installed and set up on this Mac
+    before IT Admin will work. Your IT administrator will have taken care of this for you.
+    If you are unsure, reach out to them before proceeding.</div>
   </div>
 </body>
 </html>
@@ -117,88 +95,51 @@ cat > "$PKG_RES/conclusion.html" << 'CONCLUSION'
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <style>
-  body {
-    font-family: -apple-system, sans-serif;
-    padding: 24px 28px;
-    color: #111;
-    background: transparent;
-  }
-  h2 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 6px;
-    color: #002620;
-  }
-  .subtitle {
-    font-size: 13px;
-    color: #4A5E58;
-    margin: 0 0 20px;
-  }
-  .step {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
+  body      { font-family: -apple-system, sans-serif; padding: 24px 28px; color: #111; background: transparent; }
+  h2        { font-size: 18px; font-weight: 700; margin: 0 0 6px; color: #002620; }
+  .subtitle { font-size: 13px; color: #555; margin: 0 0 20px; }
+  .step     { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
   .num {
-    background: #002620;
-    color: white;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
+    background: #002620; color: white; border-radius: 50%;
+    width: 22px; height: 22px; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
   }
-  .step-text {
-    font-size: 13px;
-    line-height: 1.55;
-    color: #333;
-  }
+  .step-text        { font-size: 13px; line-height: 1.55; color: #333; }
   .step-text strong { color: #111; }
   .note {
-    margin-top: 20px;
-    font-size: 12px;
-    color: #8A9E99;
-    border-top: 1px solid #E2E6E4;
-    padding-top: 14px;
+    margin-top: 20px; font-size: 12px; color: #777;
+    border-top: 1px solid #ddd; padding-top: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    body            { color: #ddd; }
+    h2              { color: #00c278; }
+    .subtitle       { color: #aaa; }
+    .num            { background: #00c278; color: #002620; }
+    .step-text      { color: #ccc; }
+    .step-text strong { color: #eee; }
+    .note           { color: #888; border-top-color: #444; }
   }
 </style>
 </head>
 <body>
-  <h2>You're all set!</h2>
+  <h2>You&#39;re all set!</h2>
   <p class="subtitle">IT Admin has been installed in your Applications folder.</p>
-
   <div class="step">
     <div class="num">1</div>
-    <div class="step-text">
-      Open <strong>Finder → Applications</strong> and double-click <strong>IT Admin</strong>.
-    </div>
+    <div class="step-text">Open <strong>Finder &rarr; Applications</strong> and double-click <strong>IT Admin</strong>.</div>
   </div>
   <div class="step">
     <div class="num">2</div>
-    <div class="step-text">
-      Confirm the <strong>Touch ID</strong> or password prompt — this makes sure
-      only you can access the app.
-    </div>
+    <div class="step-text">Confirm the <strong>Touch ID</strong> or password prompt &mdash; this keeps the app secure.</div>
   </div>
   <div class="step">
     <div class="num">3</div>
-    <div class="step-text">
-      You're in. Use the sidebar to navigate between tools — look up users,
-      manage groups, run offboarding, and more.
-    </div>
+    <div class="step-text">You&#39;re in. Use the sidebar to look up users, manage groups, run offboarding, and more.</div>
   </div>
-
-  <p class="note">
-    If you see a <em>"GAM not found"</em> warning when the app opens, contact
-    your IT administrator — a quick setup step is needed before you can get started.
-  </p>
+  <p class="note">If you see a <em>&ldquo;GAM not found&rdquo;</em> warning when the app opens, contact your IT administrator &mdash; a quick setup step is needed before you can get started.</p>
 </body>
 </html>
 CONCLUSION
