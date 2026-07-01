@@ -93,8 +93,36 @@ PLIST_EOF
 
 # ── Icon ──────────────────────────────────────────────────────────────────────
 echo "  Generating icon..."
+ICON_PNG="$SRC/icon.png"
 ICNS="$APP_DIR/Contents/Resources/AppIcon.icns"
-.venv/bin/python make_icon.py "$ICNS"
+
+if [ -f "$ICON_PNG" ]; then
+  ICONSET=$(mktemp -d)/AppIcon.iconset
+  mkdir -p "$ICONSET"
+
+  # Square-crop if needed
+  W=$(sips -g pixelWidth  "$ICON_PNG" | awk '/pixelWidth/  {print $2}')
+  H=$(sips -g pixelHeight "$ICON_PNG" | awk '/pixelHeight/ {print $2}')
+  SIDE=$H; [ "$W" -lt "$H" ] && SIDE=$W
+  SQUARE=$(mktemp).png
+  cp "$ICON_PNG" "$SQUARE"
+  sips -c $SIDE $SIDE "$SQUARE" > /dev/null 2>&1
+
+  for size in 16 32 64 128 256 512 1024; do
+    sips -z $size $size "$SQUARE" --out "$ICONSET/icon_${size}x${size}.png" > /dev/null 2>&1
+  done
+  cp "$ICONSET/icon_32x32.png"    "$ICONSET/icon_16x16@2x.png"
+  cp "$ICONSET/icon_64x64.png"    "$ICONSET/icon_32x32@2x.png"
+  cp "$ICONSET/icon_256x256.png"  "$ICONSET/icon_128x128@2x.png"
+  cp "$ICONSET/icon_512x512.png"  "$ICONSET/icon_256x256@2x.png"
+  cp "$ICONSET/icon_1024x1024.png" "$ICONSET/icon_512x512@2x.png"
+
+  iconutil -c icns "$ICONSET" -o "$ICNS"
+  rm -rf "$(dirname $ICONSET)" "$SQUARE"
+  echo "  Icon generated from icon.png"
+else
+  echo "  Warning: icon.png not found, skipping icon."
+fi
 
 # ── Codesign (ad-hoc, removes Gatekeeper quarantine warning for local sharing) ─
 echo "  Signing..."
