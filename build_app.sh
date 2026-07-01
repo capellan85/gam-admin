@@ -1,10 +1,10 @@
 #!/bin/bash
-# Builds a self-contained IT Admin.app bundle that can be shared with colleagues.
+# Builds a self-contained GAM Admin.app bundle that can be shared with colleagues.
 # Each recipient needs their own GAM install + OAuth credentials.
 set -e
 cd "$(dirname "$0")"
 SRC="$(pwd)"
-APP_NAME="IT Admin"
+APP_NAME="GAM Admin"
 APP_DIR="$HOME/Applications/$APP_NAME.app"
 BUNDLE_ID="io.aircall.it-admin"
 
@@ -46,7 +46,7 @@ PYTHON="$APP_DIR/.venv/bin/python3"
 
 # Recreate venv if Python binary is broken (happens when .app is moved across machines)
 if ! "$PYTHON" --version &>/dev/null 2>&1; then
-  osascript -e 'display notification "Setting up IT Admin for the first time…" with title "IT Admin"'
+  osascript -e 'display notification "Setting up GAM Admin for the first time…" with title "GAM Admin"'
   python3 -m venv --copies "$APP_DIR/.venv" 2>/dev/null
   "$APP_DIR/.venv/bin/pip" install --quiet --upgrade pip
   "$APP_DIR/.venv/bin/pip" install --quiet \
@@ -64,9 +64,9 @@ cat > "$APP_DIR/Contents/Info.plist" << PLIST_EOF
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>IT Admin</string>
+    <string>GAM Admin</string>
     <key>CFBundleDisplayName</key>
-    <string>IT Admin</string>
+    <string>GAM Admin</string>
     <key>CFBundleIdentifier</key>
     <string>${BUNDLE_ID}</string>
     <key>CFBundleVersion</key>
@@ -74,7 +74,7 @@ cat > "$APP_DIR/Contents/Info.plist" << PLIST_EOF
     <key>CFBundleShortVersionString</key>
     <string>1.0</string>
     <key>CFBundleExecutable</key>
-    <string>IT Admin</string>
+    <string>GAM Admin</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleIconFile</key>
@@ -134,7 +134,7 @@ echo ""
 echo "  To share with a colleague:"
 echo "  1. Zip it:    ditto -c -k --sequesterRsrc '$APP_DIR' ~/Desktop/IT\\ Admin.zip"
 echo "  2. Send the zip via Slack / Drive"
-echo "  3. They drag IT Admin.app → /Applications and double-click"
+echo "  3. They drag GAM Admin.app → /Applications and double-click"
 echo "     (First launch may take ~30 seconds to set up Python if venv needs rebuilding)"
 echo ""
 echo "  Note: each person needs their own GAM install + OAuth credentials."

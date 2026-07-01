@@ -4,7 +4,7 @@
 set -e
 cd "$(dirname "$0")"
 
-APP_NAME="IT Admin"
+APP_NAME="GAM Admin"
 INSTALLER_NAME="GAM Admin Installer"
 APP_BUNDLE="$HOME/Applications/$APP_NAME.app"
 VERSION="1.0"
@@ -77,14 +77,14 @@ cat > "$PKG_RES/welcome.html" << 'WELCOME'
 </head>
 <body>
   <h2>Welcome to GAM Admin</h2>
-  <p>This installer will add <strong>IT Admin</strong> to your Applications folder &mdash;
+  <p>This installer will add <strong>GAM Admin</strong> to your Applications folder &mdash;
   a tool built by the Aircall IT team to manage Google Workspace users and groups
   directly from your Mac.</p>
   <p>Everything runs locally on your machine. No data is sent to any external server.</p>
   <div class="prereq">
     <div class="prereq-title">Before you continue</div>
     <div class="prereq-body">GAM (Google Admin Manager) must be installed and set up on this Mac
-    before IT Admin will work. Your IT administrator will have taken care of this for you.
+    before GAM Admin will work. Your IT administrator will have taken care of this for you.
     If you are unsure, reach out to them before proceeding.</div>
   </div>
 </body>
@@ -126,10 +126,10 @@ cat > "$PKG_RES/conclusion.html" << 'CONCLUSION'
 </head>
 <body>
   <h2>You&#39;re all set!</h2>
-  <p class="subtitle">IT Admin has been installed in your Applications folder.</p>
+  <p class="subtitle">GAM Admin has been installed in your Applications folder.</p>
   <div class="step">
     <div class="num">1</div>
-    <div class="step-text">Open <strong>Finder &rarr; Applications</strong> and double-click <strong>IT Admin</strong>.</div>
+    <div class="step-text">Open <strong>Finder &rarr; Applications</strong> and double-click <strong>GAM Admin</strong>.</div>
   </div>
   <div class="step">
     <div class="num">2</div>
@@ -204,7 +204,7 @@ echo ""
 echo "✓ Installer ready: $OUT_PKG"
 echo ""
 echo "  Share this file with your colleague."
-echo "  They double-click it, click Continue → Install, and IT Admin"
+echo "  They double-click it, click Continue → Install, and GAM Admin"
 echo "  appears in their Applications folder."
 echo ""
 echo "  Reminder: they still need GAM installed and authorised first."
