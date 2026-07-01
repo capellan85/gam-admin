@@ -34,7 +34,7 @@ python3 -m venv --copies "$APP_RES/.venv"
 "$APP_RES/.venv/bin/pip" install --quiet --upgrade pip
 "$APP_RES/.venv/bin/pip" install --quiet \
   fastapi uvicorn httpx \
-  pywebview pyobjc-framework-Cocoa
+  pywebview pyobjc-framework-Cocoa pyobjc-framework-LocalAuthentication
 
 # ── Launcher script ───────────────────────────────────────────────────────────
 LAUNCHER="$APP_DIR/Contents/MacOS/$APP_NAME"
@@ -50,7 +50,7 @@ if ! "$PYTHON" --version &>/dev/null 2>&1; then
   python3 -m venv --copies "$APP_DIR/.venv" 2>/dev/null
   "$APP_DIR/.venv/bin/pip" install --quiet --upgrade pip
   "$APP_DIR/.venv/bin/pip" install --quiet \
-    fastapi uvicorn httpx pywebview pyobjc-framework-Cocoa
+    fastapi uvicorn httpx pywebview pyobjc-framework-Cocoa pyobjc-framework-LocalAuthentication
 fi
 
 exec "$PYTHON" "$APP_DIR/app.py"
