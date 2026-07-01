@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Admin — Aircall</title>
+<style>
+  :root {
+    --bg:           #F5F4F1;
+    --surface:      #FFFFFF;
+    --surface2:     #F0EFEC;
+    --border:       #E2E6E4;
+    --border-focus: #00c278;
+    --accent:       #00c278;
+    --accent-hover: #00b36e;
+    --accent-dim:   rgba(0,194,120,0.08);
+    --accent-text:  #004d30;
+    --success-bg:   #EDFAF4;
+    --success-text: #006642;
+    --error-bg:     #FEF1F1;
+    --error-text:   #C0392B;
+    --error-border: #F5C6C6;
+    --warn:         #B45309;
+    --warn-bg:      #FFFBEB;
+    --warn-border:  #FDE68A;
+    --text:         #111816;
+    --text-secondary: #4A5E58;
+    --muted:        #8A9E99;
+    --brand:        #002620;
+    --radius:       10px;
+    --radius-sm:    7px;
+    --shadow-sm:    0 1px 3px rgba(0,38,32,0.06), 0 1px 2px rgba(0,38,32,0.04);
+    --shadow:       0 2px 8px rgba(0,38,32,0.07), 0 1px 3px rgba(0,38,32,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  /* ── Header ── */
+  header {
+    background: var(--brand);
+    padding: 0 28px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo svg { height: 20px; width: auto; }
+  .header-tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+
+  /* ── Layout ── */
+  .layout { display: flex; height: calc(100vh - 54px); }
+
+  /* ── Nav ── */
+  nav {
+    width: 216px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 8px 24px;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  .nav-section {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px 10px 5px;
+  }
+  .nav-section:first-child { padding-top: 4px; }
+  nav button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 7px 10px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    text-align: left;
+    transition: background 0.1s, color 0.1s;
+    font-family: inherit;
+    font-weight: 400;
+  }
+  nav button:hover { background: var(--surface2); color: var(--text); }
+  nav button.active {
+    background: var(--accent-dim);
+    color: var(--accent-text);
+    font-weight: 600;
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+  nav button.active svg { color: var(--accent); }
+  nav button svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+  nav button.active svg { opacity: 1; }
+  nav button:hover svg { opacity: 0.9; }
+
+  /* ── Main ── */
+  main {
+    flex: 1;
+    padding: 36px 44px 48px;
+    max-width: 720px;
+    overflow-y: auto;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Panel header ── */
+  .panel-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 5px; letter-spacing: -0.02em; color: var(--text); }
+  .desc { color: var(--text-secondary); font-size: 13.5px; margin-bottom: 24px; line-height: 1.55; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card + .card { margin-top: 12px; }
+
+  /* ── Form ── */
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    margin-top: 18px;
+  }
+  label:first-child { margin-top: 0; }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+    font-family: inherit;
+  }
+  input:hover, textarea:hover, select:hover { background: #F0EFEC; }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(0,194,120,0.12);
+    background: var(--surface);
+  }
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A9E99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  textarea { resize: vertical; min-height: 80px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ── Buttons ── */
+  .btn {
+    margin-top: 20px;
+    padding: 9px 18px;
+    background: var(--accent);
+    color: var(--brand);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s, transform 0.07s, box-shadow 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0,194,120,0.25);
+  }
+  .btn:hover { background: var(--accent-hover); box-shadow: 0 2px 6px rgba(0,194,120,0.3); }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+    font-weight: 500;
+    box-shadow: none;
+  }
+  .btn-ghost:hover { background: var(--surface2); border-color: #C8D0CE; color: var(--text); box-shadow: none; }
+
+  .btn-danger {
+    background: transparent;
+    border: 1.5px solid #FACACB;
+    color: #C0392B;
+    font-weight: 500;
+    box-shadow: none;
+  }
+  .btn-danger:hover { background: var(--error-bg); border-color: #F5A0A1; box-shadow: none; }
+
+  /* ── Result box ── */
+  .result { margin-top: 16px; border-radius: var(--radius-sm); overflow: hidden; display: none; }
+  .result.show { display: block; }
+  .result-header {
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .result.ok .result-header { background: var(--success-bg); color: var(--success-text); border: 1px solid #B7EDD8; border-bottom: none; }
+  .result.err .result-header { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); border-bottom: none; }
+  .result pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 14px;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 280px;
+    overflow-y: auto;
+    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+    line-height: 1.65;
+  }
+
+  /* ── Offboarding steps ── */
+  .steps { margin-top: 16px; display: none; flex-direction: column; gap: 8px; }
+  .steps.show { display: flex; }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .step.ok  { border-color: #B7EDD8; background: var(--success-bg); }
+  .step.err { border-color: var(--error-border); background: var(--error-bg); }
+  .step-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+  .step.ok  .step-dot { background: var(--accent-dim); color: var(--success-text); }
+  .step.err .step-dot { background: var(--error-bg); color: var(--error-text); }
+  .step-label { flex: 1; font-weight: 500; color: var(--text); }
+  .step.ok  .step-label { color: var(--success-text); }
+  .step.err .step-label { color: var(--error-text); }
+  .step-detail { font-size: 11.5px; color: var(--muted); }
+
+  /* ── Misc ── */
+  .note { margin-top: 14px; font-size: 12px; color: var(--muted); line-height: 1.65; }
+  .note strong { color: var(--text-secondary); font-weight: 600; }
+
+  .warn-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    background: var(--warn-bg);
+    color: var(--warn);
+    border: 1px solid var(--warn-border);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 18px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(0,38,32,0.25);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 0.55s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Custom command ── */
+  .cmd-row { display: flex; }
+  .prefix {
+    padding: 9px 12px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'SF Mono', 'Menlo', monospace;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .cmd-row input { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-family: 'SF Mono', 'Menlo', monospace; }
+
+  /* ── Data tables ── */
+  .data-table-wrap {
+    margin-top: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: none;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .data-table-wrap.show { display: block; }
+  .table-header {
+    padding: 10px 16px;
+    background: var(--bg);
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-header strong { color: var(--text); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    padding: 9px 14px;
+    text-align: left;
+    color: var(--muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--accent-dim); }
+
+  .badge {
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .select-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent); }
+  .selected-badge { color: var(--accent-text); font-weight: 700; font-size: 12px; background: var(--accent-dim); padding: 2px 8px; border-radius: 4px; }
+  .transfer-row { margin-top: 14px; display: none; align-items: flex-end; gap: 12px; }
+  .transfer-row.show { display: flex; }
+  .transfer-row > div { flex: 1; }
+  .transfer-row label { margin-top: 0; }
+
+  /* divider */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* ── GAM error banner ── */
+  .gam-error {
+    display: none;
+    position: fixed; top: 54px; left: 0; right: 0; z-index: 200;
+    background: #FEF3CD; border-bottom: 1px solid #F0D070;
+    padding: 10px 24px; font-size: 13px; color: #7A5100;
+    align-items: center; gap: 10px;
+  }
+  .gam-error.show { display: flex; }
+  .gam-error svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .gam-error strong { font-weight: 700; }
+  .gam-error a { color: #7A5100; font-weight: 600; }
+  .gam-error .close-btn { margin-left: auto; cursor: pointer; opacity: 0.6; background: none; border: none; color: inherit; font-size: 16px; line-height: 1; padding: 0 4px; }
+  .gam-error .close-btn:hover { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- GAM not-found banner (hidden until health check runs) -->
+<div class="gam-error" id="gam-error">
+  <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <span id="gam-error-msg"><strong>GAM not found.</strong> Commands will not work. <a href="https://github.com/GAM-team/GAM/wiki/How-to-Install-Advanced-GAM" target="_blank">Install GAMADV-XTD3 →</a></span>
+  <button class="close-btn" onclick="document.getElementById('gam-error').classList.remove('show')">✕</button>
+</div>
+
+<header>
+  <div class="header-logo">
+    <!-- Aircall SVG wordmark (white) -->
+    <svg viewBox="0 0 368 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M41.5127 0C50.2138 1.04193e-05 57.9105 0.696391 62.5928 1.76367C71.9284 3.6985 79.2801 10.9594 81.2393 20.1797C82.3199 24.8042 83.0254 32.4062 83.0254 41C83.0254 49.5938 82.3199 57.1958 81.2393 61.8203C79.2801 71.0406 71.9284 78.3015 62.5928 80.2363C57.9105 81.3036 50.2138 82 41.5127 82C32.8117 82 25.115 81.3036 20.4326 80.2363C11.097 78.3015 3.74528 71.0406 1.78613 61.8203C0.705501 57.1958 5.21614e-08 49.5938 0 41C0 32.4062 0.705501 24.8042 1.78613 20.1797C3.74528 10.9594 11.097 3.6985 20.4326 1.76367C25.115 0.696431 32.8117 0 41.5127 0ZM41.5361 18.0869C39.2395 18.0869 37.2319 18.3305 36.1426 18.6953C35.9288 18.7684 35.7616 18.8395 35.6299 18.9141C35.2924 19.0903 34.9872 19.3189 34.7227 19.5918C33.0647 21.2116 29.3877 29.5163 25.8721 39.7744C22.7968 48.7476 20.738 56.6097 20.4844 59.9678C20.4668 60.3047 20.4668 61.4233 21.1775 62.75C23.6722 63.2769 26.233 63.7247 29.4902 64.0459C30.6365 64.1515 31.2974 63.7625 31.5732 63.125C32.3684 61.2864 34.0325 59.9035 36.0537 59.4834C37.2719 59.2049 39.2744 59.0234 41.5381 59.0234C43.8018 59.0234 45.8043 59.2049 47.0225 59.4834C49.0583 59.9065 50.7312 61.3066 51.5195 63.165C51.7797 63.7781 52.4127 64.1534 53.083 64.0928C53.5947 64.0449 56.8479 63.7237 60.8916 62.7539C61.8986 62.3784 62.6094 61.4233 62.6094 60.3047C62.3382 56.6097 60.2794 48.7476 57.2041 39.7744C53.6884 29.5163 50.0114 21.2116 48.3535 19.5918C48.0894 19.3189 47.7838 19.0903 47.4463 18.9141C47.3145 18.8395 47.1474 18.7684 46.9492 18.7012C45.8443 18.3311 43.8369 18.0869 41.5361 18.0869Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M132.695 26.7277H140.634V62.4122H132.695V55.6973C130.214 59.9738 125.962 62.4276 120.433 62.4276C111.218 62.4276 103.846 54.4353 103.846 44.5502C103.846 34.665 111.218 26.7429 120.433 26.7429C125.962 26.7429 130.214 29.1967 132.695 33.4732V26.7277ZM251.552 26.7277H259.491V62.4122H251.552V55.6973C249.071 59.9738 244.818 62.4276 239.289 62.4276C230.074 62.4276 222.703 54.4353 222.703 44.5502C222.703 34.665 230.074 26.7429 239.289 26.7429C244.818 26.7429 249.071 29.1967 251.552 33.4732V26.7277ZM122.311 54.9705C128.336 54.9705 132.873 50.4837 132.873 44.5245C132.873 38.6355 128.336 34.1486 122.311 34.1486C116.428 34.1486 111.75 38.7757 111.75 44.5245C111.75 50.3434 116.428 54.9705 122.311 54.9705ZM240.752 54.9705C246.777 54.9705 251.313 50.4837 251.313 44.5245C251.313 38.6355 246.777 34.1486 240.752 34.1486C234.868 34.1486 230.19 38.7757 230.19 44.5245C230.19 50.3434 234.868 54.9705 240.752 54.9705ZM152.521 10.2858C155.285 10.2858 157.624 12.5993 157.624 15.2634C157.624 18.0677 155.285 20.3111 152.521 20.3111C149.756 20.3111 147.488 18.0677 147.488 15.2634C147.488 12.5993 149.756 10.2858 152.521 10.2858ZM148.622 26.6332H156.49V62.3178H148.622V26.6332ZM181.205 26.6484C182.72 26.6484 184.18 26.8711 185.232 27.2667C185.851 27.4996 186.398 27.7568 186.822 27.9741L183.62 34.6036C182.611 34.3012 181.518 34.1499 180.425 34.1499C176.597 34.1499 172.344 37.3048 172.344 43.334V62.3178H164.476V26.6332H172.344V32.257C173.904 28.962 177.802 26.6484 181.205 26.6484ZM220.72 52.9387C218.097 58.6174 212.002 62.3331 204.772 62.3331C194.494 62.3331 186.626 54.6914 186.626 44.5258C186.626 34.3603 194.423 26.6484 204.701 26.6484C211.435 26.6484 217.105 29.9435 219.657 34.9912L212.994 38.7069C211.576 35.9727 208.457 34.1499 204.701 34.1499C198.747 34.1499 194.423 38.6368 194.423 44.5258C194.423 50.3448 198.817 54.8316 204.772 54.8316C208.812 54.8316 212.143 52.9387 213.703 49.7839L220.72 52.9387ZM275.345 10.2858V62.3178H267.477V10.2858H275.345ZM291.199 10.2858V62.3178H283.331V10.2858H291.199Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M342.849 26.7277H350.788V62.4122H342.849V55.6973C340.368 59.9738 336.115 62.4276 330.587 62.4276C321.372 62.4276 314 54.4353 314 44.5502C314 34.665 321.372 26.7429 330.587 26.7429C336.115 26.7429 340.368 29.1967 342.849 33.4732V26.7277ZM332.465 54.9705C338.49 54.9705 343.027 50.4837 343.027 44.5245C343.027 38.6355 338.49 34.1486 332.465 34.1486C326.582 34.1486 321.904 38.7757 321.904 44.5245C321.904 50.3434 326.582 54.9705 332.465 54.9705ZM362.674 10.2858C365.439 10.2858 367.778 12.5993 367.778 15.2634C367.778 18.0677 365.439 20.3111 362.674 20.3111C359.91 20.3111 357.642 18.0677 357.642 15.2634C357.642 12.5993 359.91 10.2858 362.674 10.2858ZM358.776 26.6332H366.644V62.3178H358.776V26.6332Z" fill="white"/>
+      <path d="M309.136 56.9776C309.136 54.3135 306.797 52 304.033 52C301.268 52 299 54.3135 299 56.9776C299 59.7819 301.268 62.0254 304.033 62.0254C306.797 62.0254 309.136 59.7819 309.136 56.9776Z" fill="white"/>
+    </svg>
+  </div>
+  <span class="header-tag">IT Admin</span>
+</header>
+
+<div class="layout">
+  <nav>
+    <div class="nav-section">Workflows</div>
+    <button onclick="show('offboarding')">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Offboarding
+    </button>
+
+    <div class="nav-section">Drive &amp; Files</div>
+    <button class="active" onclick="show('drive')">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Transfer Drive
+    </button>
+    <button onclick="show('files')">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      File Search &amp; Transfer
+    </button>
+    <button onclick="show('shareddrives')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Shared Drives
+    </button>
+
+    <div class="nav-section">Calendar</div>
+    <button onclick="show('calendar')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Transfer Calendar
+    </button>
+
+    <div class="nav-section">Messaging</div>
+    <button onclick="show('ooo')">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.64"/><path d="M14 2s4 0 4 4-4 4-4 4"/><path d="M16 6h.01"/></svg>
+      Out of Office
+    </button>
+    <button onclick="show('delegate')">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Delegate Mailbox
+    </button>
+
+    <div class="nav-section">Users</div>
+    <button onclick="show('userinfo')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      User Lookup
+    </button>
+    <button onclick="show('suspend')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Suspend / Unsuspend
+    </button>
+    <button onclick="show('resetpw')">
+      <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      Reset Password
+    </button>
+    <button onclick="show('updateuser')">
+      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Update Profile
+    </button>
+
+    <div class="nav-section">Groups</div>
+    <button onclick="show('groupadd')">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Add to Group
+    </button>
+    <button onclick="show('groupremove')">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Remove from Group
+    </button>
+    <button onclick="show('listgroups')">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      List Groups
+    </button>
+    <button onclick="show('removeallgroups')">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="14"/><line x1="23" y1="8" x2="17" y2="14"/></svg>
+      Remove All Groups
+    </button>
+
+    <div class="nav-section">Advanced</div>
+    <button onclick="show('custom')">
+      <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Custom Command
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ── OFFBOARDING ── -->
+    <div id="panel-offboarding" class="panel">
+      <div class="panel-eyebrow">Workflows</div>
+      <h2>Offboarding</h2>
+      <p class="desc">Runs 4 steps in sequence: suspend account, transfer Drive, transfer primary calendar, set Out-of-Office.</p>
+      <div class="card">
+        <div class="warn-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          This will suspend the account immediately
+        </div>
+        <label>Departing user</label>
+        <input type="email" id="ob-from" placeholder="user@aircall.io">
+        <label>Transfer files &amp; calendar to</label>
+        <input type="email" id="ob-to" placeholder="manager@aircall.io">
+        <label>OOO subject</label>
+        <input type="text" id="ob-subject" placeholder="Out of Office – [Name]">
+        <label>OOO message</label>
+        <textarea id="ob-message" placeholder="Hi, I'm no longer with Aircall. For help please contact..."></textarea>
+        <div class="row">
+          <div><label>OOO start</label><input type="date" id="ob-start"></div>
+          <div><label>OOO end</label><input type="date" id="ob-end"></div>
+        </div>
+        <button class="btn btn-danger" onclick="runOffboarding()" style="margin-top:20px">
+          <span id="ob-spinner" style="display:none" class="spinner" style="border-top-color:#C0392B"></span>
+          Run Offboarding
+        </button>
+      </div>
+      <div id="ob-steps" class="steps"></div>
+    </div>
+
+    <!-- ── TRANSFER DRIVE ── -->
+    <div id="panel-drive" class="panel active">
+      <div class="panel-eyebrow">Drive &amp; Files</div>
+      <h2>Transfer Drive</h2>
+      <p class="desc">Transfer all Drive files and folders from one user to another. The original owner retains writer access.</p>
+      <div class="card">
+        <label>From (current owner)</label>
+        <input type="email" id="drive-from" placeholder="owner@aircall.io">
+        <label>To (new owner)</label>
+        <input type="email" id="drive-to" placeholder="manager@aircall.io">
+        <button class="btn" onclick="transferDrive()">
+          <span id="drive-spinner" style="display:none" class="spinner"></span>Transfer Drive
+        </button>
+        <p class="note"><strong>Note:</strong> Large drives may take a minute to complete.</p>
+      </div>
+      <div id="drive-result" class="result"></div>
+    </div>
+
+    <!-- ── FILE SEARCH ── -->
+    <div id="panel-files" class="panel">
+      <div class="panel-eyebrow">Drive &amp; Files</div>
+      <h2>File Search &amp; Transfer</h2>
+      <p class="desc">Search files owned by a user, select the ones you want, and transfer ownership to a new user.</p>
+      <div class="card">
+        <label>Owner email</label>
+        <input type="email" id="files-owner" placeholder="owner@aircall.io">
+        <label>File name contains</label>
+        <input type="text" id="files-query" placeholder="Q4 report" onkeydown="if(event.key==='Enter') searchFiles()">
+        <button class="btn" onclick="searchFiles()">
+          <span id="files-spinner" style="display:none" class="spinner"></span>Search Files
+        </button>
+      </div>
+      <div id="files-table-wrap" class="data-table-wrap">
+        <div class="table-header">
+          <label class="select-row" style="margin:0;text-transform:none;letter-spacing:0;font-size:12px;font-weight:600;color:var(--text)">
+            <input type="checkbox" id="select-all" onchange="toggleAll(this)">
+            <strong id="files-count">0 files</strong>
+          </label>
+          <span id="selected-count" class="selected-badge"></span>
+        </div>
+        <table>
+          <thead><tr><th style="width:36px"></th><th>Name</th><th>Type</th><th>Modified</th></tr></thead>
+          <tbody id="files-tbody"></tbody>
+        </table>
+      </div>
+      <div id="transfer-row" class="transfer-row">
+        <div>
+          <label style="margin-top:0">Transfer selected to</label>
+          <input type="email" id="files-to" placeholder="manager@aircall.io">
+        </div>
+        <button class="btn" onclick="transferSelectedFiles()" style="flex-shrink:0;margin-top:0">
+          <span id="ftransfer-spinner" style="display:none" class="spinner"></span>Transfer
+        </button>
+      </div>
+      <div id="files-result" class="result" style="margin-top:16px"></div>
+    </div>
+
+    <!-- ── SHARED DRIVES ── -->
+    <div id="panel-shareddrives" class="panel">
+      <div class="panel-eyebrow">Drive &amp; Files</div>
+      <h2>Shared Drives</h2>
+      <p class="desc">List all Shared Drives a user has access to.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="sd-email" placeholder="user@aircall.io">
+        <button class="btn" onclick="listSharedDrives()">
+          <span id="sd-spinner" style="display:none" class="spinner"></span>List Shared Drives
+        </button>
+      </div>
+      <div id="sd-table-wrap" class="data-table-wrap">
+        <div class="table-header"><strong id="sd-count">0 drives</strong></div>
+        <table><thead><tr><th>Name</th><th>ID</th></tr></thead>
+        <tbody id="sd-tbody"></tbody></table>
+      </div>
+      <div id="sd-result" class="result" style="margin-top:16px"></div>
+    </div>
+
+    <!-- ── CALENDAR ── -->
+    <div id="panel-calendar" class="panel">
+      <div class="panel-eyebrow">Calendar</div>
+      <h2>Transfer Calendar</h2>
+      <p class="desc">Grant owner access on a calendar to a new user. For a primary calendar, use the owner's email as the Calendar ID.</p>
+      <div class="card">
+        <label>From (current calendar owner)</label>
+        <input type="email" id="cal-from" placeholder="owner@aircall.io">
+        <label>Calendar ID</label>
+        <input type="text" id="cal-id" placeholder="owner@aircall.io  or  abc123@group.calendar.google.com">
+        <label>To (new owner)</label>
+        <input type="email" id="cal-to" placeholder="manager@aircall.io">
+        <button class="btn" onclick="transferCalendar()">
+          <span id="cal-spinner" style="display:none" class="spinner"></span>Transfer Calendar
+        </button>
+        <p class="note"><strong>Tip:</strong> For a user's primary calendar, the Calendar ID is their email address.</p>
+      </div>
+      <div id="cal-result" class="result"></div>
+    </div>
+
+    <!-- ── OOO ── -->
+    <div id="panel-ooo" class="panel">
+      <div class="panel-eyebrow">Messaging</div>
+      <h2>Out-of-Office Message</h2>
+      <p class="desc">Enable or disable a vacation auto-reply for any user.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="ooo-email" placeholder="employee@aircall.io">
+        <label>Subject</label>
+        <input type="text" id="ooo-subject" placeholder="Out of Office – [Name]">
+        <label>Message</label>
+        <textarea id="ooo-message" placeholder="Hi, I'm currently out of office..."></textarea>
+        <div class="row">
+          <div><label>Start date</label><input type="date" id="ooo-start"></div>
+          <div><label>End date</label><input type="date" id="ooo-end"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button class="btn" onclick="oooOn()">
+            <span id="ooo-spinner" style="display:none" class="spinner"></span>Enable OOO
+          </button>
+          <button class="btn btn-ghost" onclick="oooOff()">
+            <span id="ooo-off-spinner" style="display:none" class="spinner"></span>Disable OOO
+          </button>
+        </div>
+      </div>
+      <div id="ooo-result" class="result"></div>
+    </div>
+
+    <!-- ── DELEGATE MAILBOX ── -->
+    <div id="panel-delegate" class="panel">
+      <div class="panel-eyebrow">Messaging</div>
+      <h2>Delegate Mailbox</h2>
+      <p class="desc">Give a user read and send-as access to another user's mailbox.</p>
+      <div class="card">
+        <label>Mailbox owner</label>
+        <input type="email" id="del-owner" placeholder="owner@aircall.io">
+        <label>Grant access to</label>
+        <input type="email" id="del-delegate" placeholder="assistant@aircall.io">
+        <button class="btn" onclick="delegateMailbox()">
+          <span id="del-spinner" style="display:none" class="spinner"></span>Grant Delegation
+        </button>
+      </div>
+      <div id="del-result" class="result"></div>
+    </div>
+
+    <!-- ── USER INFO ── -->
+    <div id="panel-userinfo" class="panel">
+      <div class="panel-eyebrow">Users</div>
+      <h2>User Lookup</h2>
+      <p class="desc">View full details for any user — status, org unit, last login, aliases, and more.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="info-email" placeholder="user@aircall.io" onkeydown="if(event.key==='Enter') userInfo()">
+        <button class="btn" onclick="userInfo()">
+          <span id="info-spinner" style="display:none" class="spinner"></span>Look Up User
+        </button>
+      </div>
+      <div id="info-result" class="result"></div>
+    </div>
+
+    <!-- ── SUSPEND ── -->
+    <div id="panel-suspend" class="panel">
+      <div class="panel-eyebrow">Users</div>
+      <h2>Suspend / Unsuspend User</h2>
+      <p class="desc">Immediately block or restore a user's access to all Google Workspace services.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="sus-email" placeholder="user@aircall.io">
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button class="btn btn-danger" onclick="suspendUser(true)">
+            <span id="sus-spinner" style="display:none" class="spinner"></span>Suspend Account
+          </button>
+          <button class="btn btn-ghost" onclick="suspendUser(false)">
+            <span id="unsus-spinner" style="display:none" class="spinner"></span>Unsuspend Account
+          </button>
+        </div>
+      </div>
+      <div id="sus-result" class="result"></div>
+    </div>
+
+    <!-- ── RESET PASSWORD ── -->
+    <div id="panel-resetpw" class="panel">
+      <div class="panel-eyebrow">Users</div>
+      <h2>Reset Password</h2>
+      <p class="desc">Generate a new random password and force the user to change it on next login. The new password appears in the output.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="pw-email" placeholder="user@aircall.io">
+        <button class="btn" onclick="resetPassword()">
+          <span id="pw-spinner" style="display:none" class="spinner"></span>Reset Password
+        </button>
+      </div>
+      <div id="pw-result" class="result"></div>
+    </div>
+
+    <!-- ── UPDATE USER ── -->
+    <div id="panel-updateuser" class="panel">
+      <div class="panel-eyebrow">Users</div>
+      <h2>Update User Profile</h2>
+      <p class="desc">Update a user's display name, job title, or department. Leave any field blank to leave it unchanged.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="uu-email" placeholder="user@aircall.io">
+        <div class="row">
+          <div><label>First name</label><input type="text" id="uu-first" placeholder="Jane"></div>
+          <div><label>Last name</label><input type="text" id="uu-last" placeholder="Smith"></div>
+        </div>
+        <div class="row">
+          <div><label>Job title</label><input type="text" id="uu-title" placeholder="Account Executive"></div>
+          <div><label>Department</label><input type="text" id="uu-dept" placeholder="Sales"></div>
+        </div>
+        <button class="btn" onclick="updateUser()">
+          <span id="uu-spinner" style="display:none" class="spinner"></span>Update Profile
+        </button>
+      </div>
+      <div id="uu-result" class="result"></div>
+    </div>
+
+    <!-- ── GROUP ADD ── -->
+    <div id="panel-groupadd" class="panel">
+      <div class="panel-eyebrow">Groups</div>
+      <h2>Add to Group</h2>
+      <p class="desc">Add a user to a Google Group or mailing list.</p>
+      <div class="card">
+        <label>Group email</label>
+        <input type="email" id="ga-group" placeholder="team@aircall.io">
+        <label>User to add</label>
+        <input type="email" id="ga-user" placeholder="user@aircall.io">
+        <button class="btn" onclick="groupAdd()">
+          <span id="ga-spinner" style="display:none" class="spinner"></span>Add to Group
+        </button>
+      </div>
+      <div id="ga-result" class="result"></div>
+    </div>
+
+    <!-- ── GROUP REMOVE ── -->
+    <div id="panel-groupremove" class="panel">
+      <div class="panel-eyebrow">Groups</div>
+      <h2>Remove from Group</h2>
+      <p class="desc">Remove a user from a specific Google Group.</p>
+      <div class="card">
+        <label>Group email</label>
+        <input type="email" id="gr-group" placeholder="team@aircall.io">
+        <label>User to remove</label>
+        <input type="email" id="gr-user" placeholder="user@aircall.io">
+        <button class="btn btn-ghost" onclick="groupRemove()">
+          <span id="gr-spinner" style="display:none" class="spinner"></span>Remove from Group
+        </button>
+      </div>
+      <div id="gr-result" class="result"></div>
+    </div>
+
+    <!-- ── LIST GROUPS ── -->
+    <div id="panel-listgroups" class="panel">
+      <div class="panel-eyebrow">Groups</div>
+      <h2>List Groups</h2>
+      <p class="desc">See all Google Groups a user is a member of.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="lg-email" placeholder="user@aircall.io" onkeydown="if(event.key==='Enter') listGroups()">
+        <button class="btn" onclick="listGroups()">
+          <span id="lg-spinner" style="display:none" class="spinner"></span>List Groups
+        </button>
+      </div>
+      <div id="lg-table-wrap" class="data-table-wrap">
+        <div class="table-header"><strong id="lg-count">0 groups</strong></div>
+        <table><thead><tr><th>Group email</th><th>Name</th></tr></thead>
+        <tbody id="lg-tbody"></tbody></table>
+      </div>
+      <div id="lg-result" class="result" style="margin-top:16px"></div>
+    </div>
+
+    <!-- ── REMOVE ALL GROUPS ── -->
+    <div id="panel-removeallgroups" class="panel">
+      <div class="panel-eyebrow">Groups</div>
+      <h2>Remove from All Groups</h2>
+      <p class="desc">Remove a user from every Google Group they belong to. Useful as part of offboarding.</p>
+      <div class="card">
+        <label>User email</label>
+        <input type="email" id="rag-email" placeholder="user@aircall.io">
+        <button class="btn btn-danger" onclick="removeAllGroups()">
+          <span id="rag-spinner" style="display:none" class="spinner"></span>Remove from All Groups
+        </button>
+      </div>
+      <div id="rag-result" class="result"></div>
+    </div>
+
+    <!-- ── CUSTOM ── -->
+    <div id="panel-custom" class="panel">
+      <div class="panel-eyebrow">Advanced</div>
+      <h2>Custom Command</h2>
+      <p class="desc">Run any read-only GAM command. Destructive operations (delete, remove, suspend) are blocked here — use your terminal for those.</p>
+      <div class="card">
+        <label>Command</label>
+        <div class="cmd-row">
+          <span class="prefix">gam</span>
+          <input type="text" id="custom-cmd" placeholder="info user user@aircall.io" onkeydown="if(event.key==='Enter') runCustom()">
+        </div>
+        <button class="btn" onclick="runCustom()">
+          <span id="custom-spinner" style="display:none" class="spinner"></span>Run Command
+        </button>
+      </div>
+      <div id="custom-result" class="result"></div>
+    </div>
+
+  </main>
+</div>
+
+<div style="position:fixed;bottom:10px;right:14px;font-size:10px;font-weight:600;letter-spacing:0.06em;color:var(--muted);opacity:0.55;pointer-events:none;user-select:none">App by GMO 2026</div>
+
+<script>
+// Check GAM health on load
+(async () => {
+  try {
+    const h = await fetch('/api/health').then(r => r.json());
+    if (!h.ok) {
+      const msg = document.getElementById('gam-error-msg');
+      if (!h.gam_found) {
+        msg.innerHTML = '<strong>GAM not found.</strong> Commands will not work. <a href="https://github.com/GAM-team/GAM/wiki/How-to-Install-Advanced-GAM" target="_blank">Install GAMADV-XTD3 →</a>';
+      } else {
+        msg.innerHTML = `<strong>GAM error:</strong> ${h.error}`;
+      }
+      document.getElementById('gam-error').classList.add('show');
+    }
+  } catch (e) { /* server not up yet, ignore */ }
+})();
+
+function show(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+function setResult(id, res) {
+  const el = document.getElementById(id);
+  const icon = res.ok
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  el.className = 'result show ' + (res.ok ? 'ok' : 'err');
+  el.innerHTML = `<div class="result-header">${icon}${res.ok ? 'Success' : 'Error'}</div><pre>${escHtml(res.output || '(no output)')}</pre>`;
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function spin(id, on) { const el = document.getElementById(id); if(el) el.style.display = on ? 'inline-block' : 'none'; }
+async function post(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  return r.json();
+}
+
+// Drive
+async function transferDrive() {
+  const from = document.getElementById('drive-from').value.trim(), to = document.getElementById('drive-to').value.trim();
+  if (!from || !to) return alert('Both emails are required.');
+  spin('drive-spinner', true);
+  setResult('drive-result', await post('/api/transfer-drive', { from_email: from, to_email: to }));
+  spin('drive-spinner', false);
+}
+
+// File search
+function mimeLabel(m) {
+  return {'application/vnd.google-apps.document':'Doc','application/vnd.google-apps.spreadsheet':'Sheet','application/vnd.google-apps.presentation':'Slides','application/vnd.google-apps.folder':'Folder','application/pdf':'PDF'}[m] || m.split('/').pop().replace('vnd.google-apps.','');
+}
+async function searchFiles() {
+  const owner = document.getElementById('files-owner').value.trim(), query = document.getElementById('files-query').value.trim();
+  if (!owner || !query) return alert('Both fields are required.');
+  spin('files-spinner', true);
+  const res = await post('/api/search-files', { owner_email: owner, query });
+  spin('files-spinner', false);
+  const wrap = document.getElementById('files-table-wrap'), tr = document.getElementById('transfer-row');
+  if (!res.ok || !res.files.length) { wrap.classList.remove('show'); tr.classList.remove('show'); setResult('files-result', { ok: false, output: res.output || 'No files found.' }); return; }
+  document.getElementById('files-count').textContent = `${res.files.length} file(s)`;
+  document.getElementById('select-all').checked = false;
+  document.getElementById('selected-count').textContent = '';
+  document.getElementById('files-tbody').innerHTML = res.files.map(f => `<tr><td><input type="checkbox" class="file-cb" value="${escHtml(f.id)}" onchange="updateSelectedCount()"></td><td>${escHtml(f.name)}</td><td><span class="badge">${mimeLabel(f.mimeType)}</span></td><td style="color:var(--muted);font-size:12px">${f.modified}</td></tr>`).join('');
+  wrap.classList.add('show'); tr.classList.add('show');
+  document.getElementById('files-result').className = 'result';
+}
+function updateSelectedCount() { const n = document.querySelectorAll('.file-cb:checked').length; document.getElementById('selected-count').textContent = n ? `${n} selected` : ''; }
+function toggleAll(cb) { document.querySelectorAll('.file-cb').forEach(c => c.checked = cb.checked); updateSelectedCount(); }
+async function transferSelectedFiles() {
+  const from = document.getElementById('files-owner').value.trim(), to = document.getElementById('files-to').value.trim();
+  const ids = [...document.querySelectorAll('.file-cb:checked')].map(c => c.value);
+  if (!to) return alert('Enter a destination email.'); if (!ids.length) return alert('Select at least one file.');
+  spin('ftransfer-spinner', true);
+  setResult('files-result', await post('/api/transfer-files', { from_email: from, to_email: to, file_ids: ids }));
+  spin('ftransfer-spinner', false);
+}
+
+// Shared drives
+async function listSharedDrives() {
+  const email = document.getElementById('sd-email').value.trim();
+  if (!email) return alert('Email is required.');
+  spin('sd-spinner', true);
+  const res = await post('/api/shared-drives', { email });
+  spin('sd-spinner', false);
+  const wrap = document.getElementById('sd-table-wrap');
+  if (!res.ok || !res.drives.length) { wrap.classList.remove('show'); setResult('sd-result', { ok: false, output: res.output || 'No shared drives found.' }); return; }
+  document.getElementById('sd-count').textContent = `${res.drives.length} drive(s)`;
+  document.getElementById('sd-tbody').innerHTML = res.drives.map(d => `<tr><td>${escHtml(d.name)}</td><td style="color:var(--muted);font-size:11.5px;font-family:monospace">${escHtml(d.id)}</td></tr>`).join('');
+  wrap.classList.add('show');
+  document.getElementById('sd-result').className = 'result';
+}
+
+// Calendar
+async function transferCalendar() {
+  const from = document.getElementById('cal-from').value.trim(), id = document.getElementById('cal-id').value.trim(), to = document.getElementById('cal-to').value.trim();
+  if (!from || !id || !to) return alert('All fields are required.');
+  spin('cal-spinner', true);
+  setResult('cal-result', await post('/api/transfer-calendar', { from_email: from, calendar_id: id, to_email: to }));
+  spin('cal-spinner', false);
+}
+
+// OOO
+async function oooOn() {
+  const email = document.getElementById('ooo-email').value.trim(), subject = document.getElementById('ooo-subject').value.trim(), message = document.getElementById('ooo-message').value.trim(), start = document.getElementById('ooo-start').value, end = document.getElementById('ooo-end').value;
+  if (!email || !subject || !message || !start || !end) return alert('All fields are required.');
+  spin('ooo-spinner', true);
+  setResult('ooo-result', await post('/api/ooo-on', { email, subject, message, start_date: start, end_date: end }));
+  spin('ooo-spinner', false);
+}
+async function oooOff() {
+  const email = document.getElementById('ooo-email').value.trim();
+  if (!email) return alert('Email is required.');
+  spin('ooo-off-spinner', true);
+  setResult('ooo-result', await post('/api/ooo-off', { email }));
+  spin('ooo-off-spinner', false);
+}
+
+// Delegate
+async function delegateMailbox() {
+  const owner = document.getElementById('del-owner').value.trim(), delegate = document.getElementById('del-delegate').value.trim();
+  if (!owner || !delegate) return alert('Both emails are required.');
+  spin('del-spinner', true);
+  setResult('del-result', await post('/api/delegate-mailbox', { owner_email: owner, delegate_email: delegate }));
+  spin('del-spinner', false);
+}
+
+// User info
+async function userInfo() {
+  const email = document.getElementById('info-email').value.trim();
+  if (!email) return alert('Email is required.');
+  spin('info-spinner', true);
+  setResult('info-result', await post('/api/user-info', { email }));
+  spin('info-spinner', false);
+}
+
+// Suspend
+async function suspendUser(suspend) {
+  const email = document.getElementById('sus-email').value.trim();
+  if (!email) return alert('Email is required.');
+  const sid = suspend ? 'sus-spinner' : 'unsus-spinner';
+  spin(sid, true);
+  setResult('sus-result', await post('/api/suspend-user', { email, suspend }));
+  spin(sid, false);
+}
+
+// Reset password
+async function resetPassword() {
+  const email = document.getElementById('pw-email').value.trim();
+  if (!email) return alert('Email is required.');
+  spin('pw-spinner', true);
+  setResult('pw-result', await post('/api/reset-password', { email }));
+  spin('pw-spinner', false);
+}
+
+// Update user
+async function updateUser() {
+  const email = document.getElementById('uu-email').value.trim();
+  if (!email) return alert('Email is required.');
+  spin('uu-spinner', true);
+  setResult('uu-result', await post('/api/update-user', { email, firstname: document.getElementById('uu-first').value.trim() || null, lastname: document.getElementById('uu-last').value.trim() || null, title: document.getElementById('uu-title').value.trim() || null, department: document.getElementById('uu-dept').value.trim() || null }));
+  spin('uu-spinner', false);
+}
+
+// Groups
+async function groupAdd() {
+  const group = document.getElementById('ga-group').value.trim(), user = document.getElementById('ga-user').value.trim();
+  if (!group || !user) return alert('Both fields are required.');
+  spin('ga-spinner', true);
+  setResult('ga-result', await post('/api/group-add', { group_email: group, user_email: user }));
+  spin('ga-spinner', false);
+}
+async function groupRemove() {
+  const group = document.getElementById('gr-group').value.trim(), user = document.getElementById('gr-user').value.trim();
+  if (!group || !user) return alert('Both fields are required.');
+  spin('gr-spinner', true);
+  setResult('gr-result', await post('/api/group-remove', { group_email: group, user_email: user }));
+  spin('gr-spinner', false);
+}
+async function listGroups() {
+  const email = document.getElementById('lg-email').value.trim();
+  if (!email) return alert('Email is required.');
+  spin('lg-spinner', true);
+  const res = await post('/api/user-groups', { email });
+  spin('lg-spinner', false);
+  const wrap = document.getElementById('lg-table-wrap');
+  if (!res.ok) { wrap.classList.remove('show'); setResult('lg-result', { ok: false, output: res.output || 'Error fetching groups.' }); return; }
+  if (!res.groups.length) {
+    wrap.classList.remove('show');
+    setResult('lg-result', { ok: true, output: 'This user is not a member of any Google Groups.' });
+    return;
+  }
+  document.getElementById('lg-count').textContent = `${res.groups.length} group(s)`;
+  document.getElementById('lg-tbody').innerHTML = res.groups.map(g => `<tr><td>${escHtml(g.email)}</td><td style="color:var(--text-secondary)">${escHtml(g.name)}</td></tr>`).join('');
+  wrap.classList.add('show');
+  document.getElementById('lg-result').className = 'result';
+}
+async function removeAllGroups() {
+  const email = document.getElementById('rag-email').value.trim();
+  if (!email) return alert('Email is required.');
+  if (!confirm(`Remove ${email} from ALL groups?`)) return;
+  spin('rag-spinner', true);
+  setResult('rag-result', await post('/api/remove-all-groups', { email }));
+  spin('rag-spinner', false);
+}
+
+// Offboarding
+async function runOffboarding() {
+  const from = document.getElementById('ob-from').value.trim(), to = document.getElementById('ob-to').value.trim();
+  const subject = document.getElementById('ob-subject').value.trim(), message = document.getElementById('ob-message').value.trim();
+  const start = document.getElementById('ob-start').value, end = document.getElementById('ob-end').value;
+  if (!from || !to || !subject || !message || !start || !end) return alert('All fields are required.');
+  if (!confirm(`This will suspend ${from} immediately. Continue?`)) return;
+  spin('ob-spinner', true);
+  const res = await post('/api/offboarding', { from_email: from, to_email: to, ooo_subject: subject, ooo_message: message, ooo_start: start, ooo_end: end });
+  spin('ob-spinner', false);
+  const stepsEl = document.getElementById('ob-steps');
+  stepsEl.innerHTML = res.steps.map(s => `
+    <div class="step ${s.ok ? 'ok' : 'err'}">
+      <span class="step-dot">${s.ok ? '✓' : '✗'}</span>
+      <span class="step-label">${escHtml(s.label)}</span>
+      ${!s.ok ? `<span class="step-detail">${escHtml(s.output.split('\n')[0])}</span>` : ''}
+    </div>`).join('');
+  stepsEl.classList.add('show');
+}
+
+// Custom
+async function runCustom() {
+  const cmd = document.getElementById('custom-cmd').value.trim();
+  if (!cmd) return alert('Enter a command.');
+  spin('custom-spinner', true);
+  setResult('custom-result', await post('/api/custom', { command: cmd }));
+  spin('custom-spinner', false);
+}
+</script>
+</body>
+</html>
