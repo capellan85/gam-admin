@@ -250,7 +250,7 @@ productbuild \
 
 # ── Set custom icon on the .pkg file ──────────────────────────────────────────
 if [ -f "$ICON_SRC" ]; then
-  python3 - "$ICON_SRC" "$OUT_PKG" << 'PYICON'
+  .venv/bin/python3 - "$ICON_SRC" "$OUT_PKG" << 'PYICON'
 import sys
 from AppKit import NSImage, NSWorkspace
 img = NSImage.alloc().initWithContentsOfFile_(sys.argv[1])
