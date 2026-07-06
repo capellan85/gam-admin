@@ -1,3 +1,6 @@
+import os
+import signal
+import subprocess
 import sys
 import threading
 import time
@@ -22,31 +25,24 @@ def set_app_name():
         pass
 
 
-def gam_alert():
-    """Show a native macOS alert if GAM is not found, then exit."""
+def kill_stale_server(port: int) -> None:
+    """Kill any process already listening on our port (stale previous launch)."""
     try:
-        from AppKit import NSAlert, NSCriticalAlertStyle, NSApp
-        from Foundation import NSRunLoop, NSDefaultRunLoopMode, NSDate
-        import objc
-
-        alert = NSAlert.alloc().init()
-        alert.setMessageText_("GAM Not Found")
-        alert.setInformativeText_(
-            "GAMADV-XTD3 (gam) could not be found on this system.\n\n"
-            "Please install it from:\nhttps://github.com/GAM-team/GAM/wiki/How-to-Install-Advanced-GAM\n\n"
-            "After installing, make sure 'gam' is reachable on your PATH "
-            "or placed at ~/bin/gam7/gam."
+        result = subprocess.run(
+            ["lsof", "-t", "-i", f":{port}", "-s", "TCP:LISTEN"],
+            capture_output=True, text=True
         )
-        alert.setAlertStyle_(2)  # NSCriticalAlertStyle
-        alert.addButtonWithTitle_("Open Install Guide")
-        alert.addButtonWithTitle_("Quit")
-        response = alert.runModal()
-        if response == 1000:  # first button
-            import subprocess
-            subprocess.run(["open", "https://github.com/GAM-team/GAM/wiki/How-to-Install-Advanced-GAM"])
+        for pid_str in result.stdout.strip().splitlines():
+            try:
+                pid = int(pid_str.strip())
+                if pid != os.getpid():
+                    os.kill(pid, signal.SIGTERM)
+            except Exception:
+                pass
+        if result.stdout.strip():
+            time.sleep(0.4)
     except Exception:
-        print("ERROR: GAM not found. Install GAMADV-XTD3 and ensure 'gam' is on your PATH.")
-    sys.exit(1)
+        pass
 
 
 def start_server():
@@ -67,12 +63,8 @@ def wait_for_server(timeout=10):
 
 if __name__ == "__main__":
     set_app_name()
+    kill_stale_server(PORT)
 
-    # Check GAM before doing anything else
-    if GAM is None:
-        gam_alert()
-
-    # Authenticate via Touch ID / macOS password
     if not authenticate():
         sys.exit(0)
 

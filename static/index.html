@@ -838,10 +838,17 @@
   </main>
 </div>
 
-<div style="position:fixed;bottom:10px;right:14px;font-size:10px;font-weight:600;letter-spacing:0.06em;color:var(--muted);opacity:0.55;pointer-events:none;user-select:none">App by GMO 2026</div>
+<div id="app-version" style="position:fixed;bottom:10px;right:14px;font-size:10px;font-weight:600;letter-spacing:0.06em;color:var(--muted);opacity:0.55;pointer-events:none;user-select:none">GAM Admin</div>
 
 <script>
-// Check GAM health on load
+// Load version + health on startup
+(async () => {
+  try {
+    const v = await fetch('/api/version').then(r => r.json());
+    document.getElementById('app-version').textContent = 'GAM Admin ' + (v.version || '');
+  } catch(e) {}
+})();
+
 (async () => {
   try {
     const h = await fetch('/api/health').then(r => r.json());

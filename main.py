@@ -3,6 +3,8 @@ import shlex
 import csv
 import io
 import os
+import pwd
+import shutil
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -11,18 +13,40 @@ from typing import List, Optional
 
 BASE_DIR = Path(__file__).parent
 
+VERSION = "Beta 1.5"
+
 def _find_gam() -> str | None:
+    try:
+        real_home = Path(pwd.getpwuid(os.getuid()).pw_dir)
+    except Exception:
+        real_home = Path.home()
+
     candidates = [
-        Path.home() / "bin/gam7/gam",
-        Path.home() / "bin/gam/gam",
-        Path.home() / "GAMadv-xtd3/gam",
+        real_home / "bin/gam7/gam",
+        real_home / "bin/gam/gam",
+        real_home / "GAMadv-XTD3/gam",
+        real_home / "GAMadv-xtd3/gam",
+        real_home / "GAMADV-XTD3/gam",
         Path("/usr/local/bin/gam"),
         Path("/opt/homebrew/bin/gam"),
     ]
     for p in candidates:
-        if p.exists() and os.access(p, os.X_OK):
+        if p.is_file() and os.access(p, os.X_OK):
             return str(p)
-    import shutil
+
+    shell_env = {"HOME": str(real_home), "TERM": "dumb", "PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}
+    for shell, flag in [("zsh", "-l"), ("bash", "-l"), ("zsh", "-i"), ("bash", "-i")]:
+        try:
+            result = subprocess.run(
+                [shell, flag, "-c", "which gam 2>/dev/null || command -v gam 2>/dev/null"],
+                capture_output=True, text=True, timeout=8, env=shell_env
+            )
+            gam = (result.stdout.strip().splitlines() or [""])[0]
+            if gam and not gam.startswith("gam:") and Path(gam).is_file():
+                return gam
+        except Exception:
+            pass
+
     return shutil.which("gam")
 
 GAM = _find_gam()
@@ -117,7 +141,11 @@ class CustomCommandRequest(BaseModel):
     command: str
 
 
-# ── Health ────────────────────────────────────────────────────────────────────
+# ── Health / Version ──────────────────────────────────────────────────────────
+
+@app.get("/api/version")
+def app_version():
+    return {"version": VERSION}
 
 @app.get("/api/health")
 def health():
@@ -126,8 +154,8 @@ def health():
                 "error": "GAM not found. Install GAMADV-XTD3 and make sure it is on your PATH."}
     try:
         r = subprocess.run([GAM, "version"], capture_output=True, text=True, timeout=10)
-        version = (r.stdout + r.stderr).strip().splitlines()[0] if r.stdout or r.stderr else "unknown"
-        return {"ok": True, "gam_found": True, "gam_path": GAM, "version": version}
+        gam_ver = (r.stdout + r.stderr).strip().splitlines()[0] if r.stdout or r.stderr else "unknown"
+        return {"ok": True, "gam_found": True, "gam_path": GAM, "version": gam_ver}
     except Exception as e:
         return {"ok": False, "gam_found": True, "gam_path": GAM,
                 "error": f"GAM found but failed to run: {e}"}
